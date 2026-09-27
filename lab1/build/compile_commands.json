@@ -1,0 +1,20 @@
+[
+{
+  "directory": "E:/Projects/SJTU-SEP-LAB/Lab Init/lab1/build",
+  "command": "D:\\Programs\\Development\\mingw64\\bin\\g++.exe   -g -std=gnu++11 -o CMakeFiles\\lab1lib.dir\\Class.cc.obj -c \"E:\\Projects\\SJTU-SEP-LAB\\Lab Init\\lab1\\Class.cc\"",
+  "file": "E:/Projects/SJTU-SEP-LAB/Lab Init/lab1/Class.cc",
+  "output": "CMakeFiles/lab1lib.dir/Class.cc.obj"
+},
+{
+  "directory": "E:/Projects/SJTU-SEP-LAB/Lab Init/lab1/build",
+  "command": "D:\\Programs\\Development\\mingw64\\bin\\g++.exe   -g -std=gnu++11 -o CMakeFiles\\lab1lib.dir\\Student.cc.obj -c \"E:\\Projects\\SJTU-SEP-LAB\\Lab Init\\lab1\\Student.cc\"",
+  "file": "E:/Projects/SJTU-SEP-LAB/Lab Init/lab1/Student.cc",
+  "output": "CMakeFiles/lab1lib.dir/Student.cc.obj"
+},
+{
+  "directory": "E:/Projects/SJTU-SEP-LAB/Lab Init/lab1/build",
+  "command": "D:\\Programs\\Development\\mingw64\\bin\\g++.exe   -g -std=gnu++11 -o CMakeFiles\\lab1.dir\\main.cc.obj -c \"E:\\Projects\\SJTU-SEP-LAB\\Lab Init\\lab1\\main.cc\"",
+  "file": "E:/Projects/SJTU-SEP-LAB/Lab Init/lab1/main.cc",
+  "output": "CMakeFiles/lab1.dir/main.cc.obj"
+}
+]

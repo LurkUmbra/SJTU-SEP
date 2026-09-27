@@ -1,0 +1,16 @@
+StdErr:
+Wrong Score
+Wrong Score
+No Match Student
+StdOut:
+Highest,Lowest,Avg = 90.00,0.00,53.00
+Highest,Lowest,Avg = 90.00,80.00,85.00
+Highest,Lowest,Avg = 78.00,70.00,73.40
+GPA,AVG = 3.20,77.60
+GPA,AVG = 0.00,0.00
+GPA,AVG = 3.40,82.80
+GPA,AVG = 4.14,82.88
+GPA,AVG = 3.23,64.50
+GPA,AVG = 3.50,70.00
+GPA,AVG = 2.25,45.00
+GPA,AVG = 0.00,0.00

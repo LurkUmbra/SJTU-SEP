@@ -1,0 +1,3 @@
+D:\Programs\Development\mingw64\bin\cmake.exe -E rm -f CMakeFiles\lab1.dir/objects.a
+D:\Programs\Development\mingw64\bin\ar.exe qc CMakeFiles\lab1.dir/objects.a @CMakeFiles\lab1.dir\objects1.rsp
+D:\Programs\Development\mingw64\bin\g++.exe -g -Wl,--whole-archive CMakeFiles\lab1.dir/objects.a -Wl,--no-whole-archive -o lab1.exe -Wl,--out-implib,liblab1.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\lab1.dir\linkLibs.rsp

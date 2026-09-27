@@ -1,0 +1,2 @@
+D:\Programs\Development\mingw64\bin\ar.exe qc liblab1lib.a CMakeFiles/lab1lib.dir/Class.cc.obj CMakeFiles/lab1lib.dir/Student.cc.obj
+D:\Programs\Development\mingw64\bin\ranlib.exe liblab1lib.a
