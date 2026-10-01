@@ -60,9 +60,110 @@ Status Simulator::next_instruction() {
             return Status::AOK;
         }
         case InstructionCode::IRMOVQ: // 3:0 F:regB imm
+        {
+            const std::optional<uint8_t> regs = memory.get_byte(next_pc);
+            if (!regs) {
+                report_bad_inst_addr();
+                return Status::ADR;
+            }
+
+            const uint8_t reg_a = get_hi4(regs.value());
+            const uint8_t reg_b = get_lo4(regs.value());
+            if (reg_a != 0xF || error_invalid_reg(reg_b)) return Status::ADR;
+            next_pc++;
+
+            const std::optional<uint64_t> imm = memory.get_long(next_pc);
+            registers[reg_b] = imm.value();
+            pc = next_pc + 8;
+            return Status::AOK;
+        }
         case InstructionCode::RMMOVQ: // 4:0 regA:regB imm
+        {
+            const std::optional<uint8_t> regs = memory.get_byte(next_pc);
+            if (!regs) {
+                report_bad_inst_addr();
+                return Status::ADR;
+            }
+
+            const uint8_t reg_a = get_hi4(regs.value());
+            const uint8_t reg_b = get_lo4(regs.value());
+            if (error_invalid_reg(reg_a)) return Status::ADR;
+            if (error_invalid_reg(reg_b)) return Status::ADR;
+            next_pc++;
+
+            const std::optional<uint64_t> imm = memory.get_long(next_pc);
+            if (!imm.has_value()) {
+                report_bad_inst_addr();
+                return Status::ADR;
+            }
+
+            uint64_t addr = registers[reg_b] + imm.value();
+            if (!memory.set_long(addr, registers[reg_a])) {
+                report_bad_data_addr(addr);
+                return Status::ADR;
+            }
+            pc = next_pc + 8;
+            return Status::AOK;
+        }
         case InstructionCode::MRMOVQ: // 5:0 regA:regB imm
+        {
+            const std::optional<uint8_t> regs = memory.get_byte(next_pc);
+            if(!regs.has_value()) {
+                report_bad_inst_addr();
+                return Status::ADR;
+            }
+
+            const uint8_t reg_a = get_hi4(regs.value());
+            const uint8_t reg_b = get_lo4(regs.value());
+            if (error_invalid_reg(reg_a)) return Status::ADR;
+            if (error_invalid_reg(reg_b)) return Status::ADR;
+            next_pc++;
+
+            const std::optional<uint64_t> imm = memory.get_long(next_pc);
+            if (!imm.has_value()) {
+                report_bad_inst_addr();
+                return Status::ADR;
+            }
+
+            const uint64_t addr = registers[reg_b] + imm.value();
+            if (!memory.set_long(addr, registers[reg_a])) {
+                report_bad_data_addr(next_pc);
+                return Status::ADR;
+            }
+            pc = next_pc + 8;
+            return Status::AOK;
+        }
         case InstructionCode::ALU: // 6:x regA:regB
+        {
+            const std::optional<uint8_t> regs = memory.get_byte(next_pc);
+            if (!regs.has_value()) {
+                report_bad_inst_addr();
+                return Status::ADR;
+            }
+
+            const uint8_t reg_a = get_hi4(regs.value());
+            const uint8_t reg_b = get_lo4(regs.value());
+            if (error_invalid_reg(reg_a)) return Status::ADR;
+            if (error_invalid_reg(reg_b)) return Status::ADR;
+            next_pc++;
+
+            auto old_reg_b = registers[reg_b];
+            auto op = static_cast<AluOp>(ifun);
+            switch (op) {
+                case AluOp::ADD:
+                    registers[reg_b] += registers[reg_a];
+                case AluOp::SUB:
+                    registers[reg_b] -= registers[reg_a];
+                case AluOp::AND:
+                    registers[reg_b] &= registers[reg_a];
+                case AluOp::XOR:
+                    registers[reg_b] ^= registers[reg_a];
+            }
+            
+            cc = cc.compute(op, registers[reg_a], old_reg_b, registers[reg_b]);
+            pc = next_pc;
+            return Status::AOK;
+        }
         case InstructionCode::JMP: // 7:x imm
         case InstructionCode::CALL: // 8:0 imm
         case InstructionCode::RET: // 9:0
