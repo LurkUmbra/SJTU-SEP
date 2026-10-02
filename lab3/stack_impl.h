@@ -8,32 +8,50 @@ Stack<T>::Stack() : sz(0), head(nullptr) { }
 
 template <typename T>
 Stack<T>::~Stack() {
-    // TODO
+    auto cur = head;
+    while (cur != nullptr) {
+        auto nxt = cur->next;
+        delete cur;
+        cur = nxt;
+    }
+    head = nullptr;
+    sz = 0;
 }
 
 template <typename T>
 void Stack<T>::push(T t) {
-    // TODO
+    auto cur = head;
+    while (cur->next != nullptr) cur = cur->next;
+    cur->next = new Node(t, nullptr);
+    sz++;
 }
 
 template <typename T>
 void Stack<T>::pop() {
-    // TODO
+    assert(!empty());
+    auto cur = head;
+    while (cur->next->next != nullptr) cur = cur->next;
+    delete cur->next;
+    cur->next = nullptr;
+    sz--;
 }
 
 template <typename T>
 T& Stack<T>::top() {
-    // TODO
+    assert(!empty())
+    auto cur = head;
+    while (cur->next != nullptr) cur = cur->next;
+    return cur->val;
 }
 
 template <typename T>
 bool Stack<T>::empty() const {
-    // TODO
+    return size() == 0;
 }
 
 template <typename T>
 size_t Stack<T>::size() const {
-    // TODO
+    return sz;
 }
 
 #endif
