@@ -8,31 +8,50 @@ Queue<T>::Queue() : sz(0), head(nullptr), tail(nullptr) { }
 
 template <typename T>
 Queue<T>::~Queue() {
-    // TODO
+    auto cur = head;
+    while (cur != nullptr) {
+        auto nxt = cur->next;
+        delete cur;
+        cur = nxt;
+    }
+    head = nullptr;
+    tail = nullptr;
+    sz = 0;
 }
 
 template <typename T>
 void Queue<T>::push(T t) {
-    // TODO
+    if (empty()) {
+        head = tail = new Node(t, nullptr);
+    } else {
+        tail->next = new Node(t, nullptr);
+        tail = tail->next;
+    }
+    sz++;
 }
 
 template <typename T>
 void Queue<T>::pop() {
-    // TODO
+    assert(!empty());
+    auto nxt = head->next;
+    delete head;
+    head = nxt;
+    sz--;
 }
 
 template <typename T>
 T &Queue<T>::front() {
-    // TODO
+    assert(!empty());
+    return head->val;
 }
 
 template <typename T>
 bool Queue<T>::empty() const {
-    // TODO
+    return size() == 0;
 }
 
 template <typename T>
 size_t Queue<T>::size() const {
-    // TODO
+    return sz == 0;
 }
 #endif
