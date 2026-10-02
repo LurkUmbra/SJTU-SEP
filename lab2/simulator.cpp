@@ -69,7 +69,8 @@ Status Simulator::next_instruction() {
 
             const uint8_t reg_a = get_hi4(regs.value());
             const uint8_t reg_b = get_lo4(regs.value());
-            if (reg_a != 0xF || error_invalid_reg(reg_b)) return Status::INS;
+            if (error_valid_reg(reg_a)) return Status::INS;
+            if (error_invalid_reg(reg_b)) return Status::INS;
             next_pc++;
 
             const std::optional<uint64_t> imm = memory.get_long(next_pc);
@@ -153,8 +154,8 @@ Status Simulator::next_instruction() {
             if (error_invalid_reg(reg_b)) return Status::INS;
             next_pc++;
             
-            const auto old_reg_a = registers[reg_a];
-            const auto old_reg_b = registers[reg_b];
+            const auto old_reg_a_value= registers[reg_a];
+            const auto old_reg_b_value = registers[reg_b];
             const auto op = static_cast<AluOp>(ifun);
             switch (op) {
                 case AluOp::ADD:
@@ -174,22 +175,24 @@ Status Simulator::next_instruction() {
                 return Status::INS;
             }
             
-            cc = ConditionCodes::compute(op, old_reg_a, old_reg_b, registers[reg_b]);
+            cc = ConditionCodes::compute(op, old_reg_a_value, old_reg_b_value, registers[reg_b]);
             pc = next_pc;
             return Status::AOK;
         }
         case InstructionCode::JMP: // 7:x imm
-        {
-            if(cc.satisfy(static_cast<Condition>(ifun))) {
-                const std::optional<uint64_t> dest = memory.get_long(next_pc);
-                if (!dest.has_value()) {
-                    report_bad_inst_addr();
-                    return Status::ADR;
-                }
-                pc = dest.value();
-                return Status::AOK;
+        {   
+            auto dest = memory.get_long(next_pc);
+            if (!dest.has_value()) {
+                report_bad_inst_addr();
+                return Status::ADR;
             }
-            pc = next_pc + 8;
+            next_pc += 8;
+
+            if(cc.satisfy(static_cast<Condition>(ifun))) {
+                pc = dest.value();
+            } else {
+                pc = next_pc;
+            }
             return Status::AOK;
         }
         case InstructionCode::CALL: // 8:0 imm
@@ -230,22 +233,16 @@ Status Simulator::next_instruction() {
             const uint8_t reg_a = get_hi4(regs.value());
             const uint8_t reg_b = get_lo4(regs.value());
             if (error_invalid_reg(reg_a)) return Status::INS;
-            if (reg_b != 0xF) return Status::INS;
+            if (error_valid_reg(reg_b)) return Status::INS;
             next_pc++;
-
-            if (Registers::name(reg_a) == "%rsp") {
-                if (!memory.set_long(registers[RegId::RSP] - 8, registers[RegId::RSP])) {
-                    report_bad_stack_addr(registers[RegId::RSP] - 8);
-                    return Status::ADR;
-                }
-                registers[RegId::RSP] -= 8;
-            } else {
-                registers[RegId::RSP] -= 8;
-                if (!memory.set_long(registers[RegId::RSP], registers[reg_a])) {
-                    report_bad_stack_addr(registers[RegId::RSP]);
-                    return Status::ADR;
-                }
+            
+            auto new_sp = registers[RegId::RSP] - 8;
+            auto val = registers[reg_a];
+            if (!memory.set_long(new_sp, val)) {
+                report_bad_stack_addr(new_sp);
+                return Status::ADR;
             }
+            registers[RegId::RSP] -= 8;
             pc = next_pc;
             return Status::AOK;
         }
@@ -260,19 +257,17 @@ Status Simulator::next_instruction() {
             const uint8_t reg_a = get_hi4(regs.value());
             const uint8_t reg_b = get_lo4(regs.value());
             if (error_invalid_reg(reg_a)) return Status::INS;
-            if (reg_b != 0xF) return Status::INS;
+            if (error_valid_reg(reg_b)) return Status::INS;
             next_pc++;
-
-            const std::optional<uint64_t> val = memory.get_long(registers[RegId::RSP]);
+            
+            auto old_rsp = registers[RegId::RSP];
+            auto val = memory.get_long(old_rsp);
             if (!val.has_value()) {
                 report_bad_stack_addr(registers[RegId::RSP]);
                 return Status::ADR;
             }
+            registers[RegId::RSP] += 8;
             registers[reg_a] = val.value();
-            if (Registers::name(reg_a) != "%rsp") {
-                registers[RegId::RSP] += 8;
-            }
-            
             pc = next_pc;
             return Status::AOK;
         }
