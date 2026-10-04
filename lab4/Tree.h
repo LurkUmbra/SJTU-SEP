@@ -4,20 +4,19 @@
 #include <stdio.h>
 #include <iostream>
 #include <vector>
-using namespace std;
 
 /****************************************************************
  *                    Write your code below
  ****************************************************************/
 
-struct point{
+struct Point{
     long long x;
     long long y;
 };
 
 class TreeNode
 {
-  friend ostream &operator<<(ostream &out, const TreeNode &b);
+  friend std::ostream &operator<<(std::ostream &out, const TreeNode &b);
   friend class BinaryTree;
   friend class BinaryDimonTree;
 
@@ -26,19 +25,25 @@ private:
   long long data[2];
   TreeNode* left;
   TreeNode* right;
-  long long k;//
+  long long level;
 public:
   /* methods */
   TreeNode();
-  long long getX();  /* DO NOT CHANGE */
-  long long getY();  /* DO NOT CHANGE */
+  long long getX() const;  /* DO NOT CHANGE */
+  long long getY() const;  /* DO NOT CHANGE */
   ~TreeNode(); /* DO NOT CHANGE */
+  static void destroyTree(TreeNode* node) {
+    if (!node) return;
+    destroyTree(node->left);
+    destroyTree(node->right);
+    delete node;
+  }
 };
 
 
 class BinaryDimonTree
 {
-friend istream &operator>>(istream &in, BinaryDimonTree &tree); /* DO NOT CHANGE */
+friend std::istream &operator>>(std::istream &in, BinaryDimonTree &tree); /* DO NOT CHANGE */
 
 private:
   /* data */
@@ -51,8 +56,8 @@ public:
 
   void recur_search(TreeNode *cur, long long x, long long y, long long int &min_distance, TreeNode **guess);
   ~BinaryDimonTree();
-  void clear(TreeNode *tmp);
-  void buildBDTree(TreeNode *node, point *a, long long size, long long k);
+  void buildBDTree(std::vector<Point>& points);
+  TreeNode* buildHelper(std::vector<Point>& points, long long lo, long long hi, int level);
 };
 
 #endif //C_BINARYDIMEN_TREE_H
